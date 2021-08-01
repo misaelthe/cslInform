@@ -1,0 +1,1 @@
+checkear foreach en curretninform
