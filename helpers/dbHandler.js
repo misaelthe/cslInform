@@ -1,4 +1,5 @@
 const fs = require("fs");
+const inquirer = require("inquirer");
 const archiveJson = "./db/data.json";
 
 const saveInform = async (inform) => {
@@ -33,4 +34,25 @@ const getInform = (key) => {
   }
   return null;
 };
-module.exports = { saveInform, readInforms, getInform };
+const deleteInform = (key) => {
+  const informsTemp = readInforms();
+  let indexToDelete = null;
+  informsTemp.forEach((elm, idx) => {
+    if (elm.id === key) {
+      indexToDelete = idx;
+    }
+  });
+  if (indexToDelete !== null) {
+    informsTemp.splice(indexToDelete, 1);
+    fs.writeFileSync(archiveJson, JSON.stringify(informsTemp));
+    return 0;
+  }
+  return -1;
+};
+
+module.exports = {
+  saveInform,
+  readInforms,
+  getInform,
+  deleteInform,
+};

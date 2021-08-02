@@ -1,12 +1,18 @@
-const { menu, question, printMessage } = require("./helpers/messageHandler");
-const { saveInform, getInform } = require("./helpers/dbHandler");
+const {
+  menu,
+  question,
+  printMessage,
+  printInform,
+  listMonths,
+} = require("./helpers/messageHandler");
+const { saveInform, getInform, deleteInform } = require("./helpers/dbHandler");
 const Inform = require("./models/inform");
 
 const main = async () => {
   let selected = 0;
   let year = null;
   let month = null;
-  while (selected !== 5) {
+  while (selected !== 6) {
     console.clear();
     selected = await menu();
     switch (selected) {
@@ -28,34 +34,75 @@ const main = async () => {
           year
         );
         await saveInform({ id: `${month}.${year}`, data: objInform });
-        await question(`Presione ${"ENTER".blue} para continuar`, 0);
+        await question(`Presione ${"ENTER".blue} para continuar`, false);
         break;
       case 2:
-        const key = `${new Date().getMonth()}.${new Date().getFullYear()}`;
-        const inform = getInform(key);
+        const keyOptionTwo = `${new Date().getMonth()}.${new Date().getFullYear()}`;
+        const informOptionTwo = getInform(keyOptionTwo);
 
-        if (inform) {
-          const msg =
-            `${"Tiempo ".green} -> ` +
-            `${inform.data.hours}:${inform.data.minutes}`.yellow +
-            `${" | ".red}` +
-            `${"Videos ".green} -> ` +
-            `${inform.data.videos}`.yellow +
-            `${" | ".red}` +
-            `${"Revisitas ".green} -> ` +
-            `${inform.data.returnVisits}`.yellow +
-            `${" | ".red}` +
-            `${"Estudios ".green} -> ` +
-            `${inform.data.studies}`.yellow;
-          printMessage(msg);
-          await question(`Presione ${"ENTER".blue} para continuar`, 0);
+        if (informOptionTwo) {
+          printInform(
+            informOptionTwo.data.hours,
+            informOptionTwo.data.minutes,
+            informOptionTwo.data.videos,
+            informOptionTwo.data.returnVisits,
+            informOptionTwo.data.studies
+          );
+          await question(`Presione ${"ENTER".blue} para continuar`, false);
         } else
           await question(
             `No hay ${"INFORME".red} para este mes. Presione ${
               "ENTER".blue
             } para continuar`,
-            0
+            false
           );
+        break;
+      case 3:
+        year = await question(`Ingrese el ${"AÑO".blue} a buscar: `);
+        month = await question(
+          `Ingrese el ${"MES".blue} a buscar (${"SOLO SU NUMERO".red}): `
+        );
+        const keyOptionThree = `${month - 1}.${year}`;
+        const informOptionThree = getInform(keyOptionThree);
+        if (informOptionThree) {
+          printInform(
+            informOptionThree.data.hours,
+            informOptionThree.data.minutes,
+            informOptionThree.data.videos,
+            informOptionThree.data.returnVisits,
+            informOptionThree.data.studies
+          );
+          await question(`Presione ${"ENTER".blue} para continuar`, false);
+        } else
+          await question(
+            `No hubo ${"INFORME".red} para ese mes. Presione ${
+              "ENTER".blue
+            } para continuar`,
+            false
+          );
+        break;
+      case 4:
+        year = await question(`Ingrese el ${"AÑO".blue} a eliminar: `);
+        month = await question(
+          `Ingrese el ${"MES".blue} a eliminar (${"SOLO SU NUMERO".red}): `
+        );
+        const keyOptionFour = `${month - 1}.${year}`;
+        const outcomeFour = await deleteInform(keyOptionFour);
+        outcomeFour === 0
+          ? await question(
+              `Excelente. Presione ${"ENTER".blue} para continuar`,
+              false
+            )
+          : await question(
+              `No existe informe para ese año. Presione ${
+                "ENTER".blue
+              } para continuar`,
+              false
+            );
+        break;
+      case 5:
+        const monthsSelected = await listMonths();
+        await question(`Presione ${"ENTER".blue} para continuar`, false);
         break;
       default:
         break;
