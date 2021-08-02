@@ -1,6 +1,5 @@
-const { v4: uuidv4 } = require("uuid");
+//const { v4: uuidv4 } = require("uuid");
 class Inform {
-  id = "";
   hours = 0;
   minutes = 0;
   videos = 0;
@@ -17,7 +16,7 @@ class Inform {
     month = null,
     year = null
   ) {
-    this.id = uuidv4();
+    //this.id = uuidv4();
     this.hours = hours;
     this.minutes = minutes;
     this.videos = videos;

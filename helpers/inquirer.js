@@ -20,24 +20,6 @@ const menu = async () => {
   const { selected } = await inquirer.prompt(options);
   return selected;
 };
-
-const readLine = async (message) => {
-  const config = [
-    {
-      type: "input",
-      name: "data",
-      message,
-      validate(val) {
-        if (val.length == 0) {
-          return "Ingrese un valor";
-        }
-        return true;
-      },
-    },
-  ];
-  const { data } = await inquirer.prompt(config);
-  return data;
-};
 const question = async (message, acceptEnter = 0) => {
   const config = [
     {
@@ -55,14 +37,4 @@ const question = async (message, acceptEnter = 0) => {
   const { data } = await inquirer.prompt(config);
   return data;
 };
-const askConfirmation = async () => {
-  const option = [
-    {
-      type: "input",
-      name: "selected",
-      message: `Presione ${"ENTER".blue} para continuar`,
-    },
-  ];
-  return await inquirer.prompt(option);
-};
-module.exports = { menu, askConfirmation, readLine, question };
+module.exports = { menu, question };

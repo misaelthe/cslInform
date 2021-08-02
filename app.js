@@ -1,16 +1,11 @@
-const { menu, askConfirmation, question } = require("./helpers/inquirer");
-const { saveInform, readInforms } = require("./helpers/dbHandler");
-const Informs = require("./models/informs");
+const { menu, question } = require("./helpers/inquirer");
+const { saveInform, readInforms, getInform } = require("./helpers/dbHandler");
+const Inform = require("./models/inform");
 
 const main = async () => {
-  const informs = new Informs();
   let selected = 0;
   let year = null;
   let month = null;
-  const dataRead = readInforms();
-  if (dataRead) {
-    informs.loadInforms(dataRead);
-  }
   while (selected !== 5) {
     selected = await menu();
     switch (selected) {
@@ -22,7 +17,7 @@ const main = async () => {
         const videos = await question(`Ingrese ${"VIDEOS: ".blue}`);
         const returnVisits = await question(`Ingrese ${"REVISITAS: ".blue}`);
         const studies = await question(`Ingrese ${"ESTUDIOS: ".blue}`);
-        await informs.createInform(
+        const objInform = await new Inform(
           hours,
           minutes,
           videos,
@@ -31,17 +26,20 @@ const main = async () => {
           month,
           year
         );
-        await saveInform(informs._listInforms);
+        await saveInform({ id: `${month}.${year}`, objInform });
         await question(`Presione ${"ENTER".blue} para continuar`, 0);
         break;
       case 2:
-        year = new Date().getFullYear();
-        month = new Date().getMonth();
-        const inform = await informs.getCurrentInform(month, year);
-        inform != null
+        const key = `${new Date().getMonth()}.${new Date().getFullYear()}`;
+        const inform = await getInform(key);
+        inform !== null
           ? console.log(inform)
-          : console.log(`No hay ${"INFORME".red} para este mes`);
-        await askConfirmation();
+          : await question(
+              `No hay ${"INFORME".red} para este mes. Presione ${
+                "ENTER".blue
+              } para continuar`,
+              0
+            );
         break;
       default:
         break;
@@ -49,14 +47,10 @@ const main = async () => {
   }
 };
 const test = async () => {
-  let informs = [];
-  informs[5] = { maa: "asas", asas: "asas" };
-  informs[4] = 5;
-  const mapas = [1, 2, 3, 4];
-  informs = Object.assign({}, mapas);
-  console.log(informs);
-  mapas[0] = 10;
-  console.log(informs);
+  let informsasas = null;
+  informsasas[5] = { maa: "asas", asas: "asas" };
+  informsasas[4] = 5;
+  console.log(informsasas);
 };
 main();
 //test();
