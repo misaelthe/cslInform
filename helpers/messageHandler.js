@@ -1,11 +1,15 @@
 const inquirer = require("inquirer");
+/* const readline = require("readline").createInterface({
+  input: process.stdin,
+  output: process.stdout,
+}); */
 require("colors");
 
 const menu = async () => {
   const options = [
     {
       type: "list",
-      message: `${"Registro de Informe".cyan}`,
+      message: `${"Informe".cyan}`,
       name: "selected",
       choices: [
         { value: 1, name: `${"1. ".red} ${"Nuevo informe".green}` },
@@ -16,18 +20,17 @@ const menu = async () => {
       ],
     },
   ];
-  console.clear();
   const { selected } = await inquirer.prompt(options);
   return selected;
 };
-const question = async (message, acceptEnter = 0) => {
+const question = async (message, returnValue = true) => {
   const config = [
     {
       name: "data",
       type: "input",
       message,
-      validation(val) {
-        if (val.length === 0 && acceptEnter === 1) {
+      validate(val) {
+        if (val.length === 0 && returnValue === true) {
           return "Ingrese un valor";
         }
         return true;
@@ -37,4 +40,7 @@ const question = async (message, acceptEnter = 0) => {
   const { data } = await inquirer.prompt(config);
   return data;
 };
-module.exports = { menu, question };
+const printMessage = (msg) => {
+  console.log(msg + "\n");
+};
+module.exports = { menu, question, printMessage };

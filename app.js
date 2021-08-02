@@ -1,5 +1,5 @@
-const { menu, question } = require("./helpers/inquirer");
-const { saveInform, readInforms, getInform } = require("./helpers/dbHandler");
+const { menu, question, printMessage } = require("./helpers/messageHandler");
+const { saveInform, getInform } = require("./helpers/dbHandler");
 const Inform = require("./models/inform");
 
 const main = async () => {
@@ -7,6 +7,7 @@ const main = async () => {
   let year = null;
   let month = null;
   while (selected !== 5) {
+    console.clear();
     selected = await menu();
     switch (selected) {
       case 1:
@@ -17,7 +18,7 @@ const main = async () => {
         const videos = await question(`Ingrese ${"VIDEOS: ".blue}`);
         const returnVisits = await question(`Ingrese ${"REVISITAS: ".blue}`);
         const studies = await question(`Ingrese ${"ESTUDIOS: ".blue}`);
-        const objInform = await new Inform(
+        const objInform = new Inform(
           hours,
           minutes,
           videos,
@@ -26,20 +27,35 @@ const main = async () => {
           month,
           year
         );
-        await saveInform({ id: `${month}.${year}`, objInform });
+        await saveInform({ id: `${month}.${year}`, data: objInform });
         await question(`Presione ${"ENTER".blue} para continuar`, 0);
         break;
       case 2:
         const key = `${new Date().getMonth()}.${new Date().getFullYear()}`;
-        const inform = await getInform(key);
-        inform !== null
-          ? console.log(inform)
-          : await question(
-              `No hay ${"INFORME".red} para este mes. Presione ${
-                "ENTER".blue
-              } para continuar`,
-              0
-            );
+        const inform = getInform(key);
+
+        if (inform) {
+          const msg =
+            `${"Tiempo ".green} -> ` +
+            `${inform.data.hours}:${inform.data.minutes}`.yellow +
+            `${" | ".red}` +
+            `${"Videos ".green} -> ` +
+            `${inform.data.videos}`.yellow +
+            `${" | ".red}` +
+            `${"Revisitas ".green} -> ` +
+            `${inform.data.returnVisits}`.yellow +
+            `${" | ".red}` +
+            `${"Estudios ".green} -> ` +
+            `${inform.data.studies}`.yellow;
+          printMessage(msg);
+          await question(`Presione ${"ENTER".blue} para continuar`, 0);
+        } else
+          await question(
+            `No hay ${"INFORME".red} para este mes. Presione ${
+              "ENTER".blue
+            } para continuar`,
+            0
+          );
         break;
       default:
         break;
